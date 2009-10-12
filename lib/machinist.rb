@@ -6,6 +6,14 @@ module Machinist
   #
   # The blueprint is instance_eval'd against the Lathe.
   class Lathe
+    # Make it a blank slate
+    (private_instance_methods + instance_methods).each { |m|
+      unless m =~ /^__/ ||
+             m =~ /^initialize|instance_(eval|exec)|block_given\?$/
+        undef_method m
+      end
+    }
+
     def self.run(adapter, object, *args)
       blueprint       = object.class.blueprint
       named_blueprint = object.class.blueprint(args.shift) if args.first.is_a?(Symbol)
@@ -50,11 +58,6 @@ module Machinist
     def assigned_attributes
       @assigned_attributes ||= {}
     end
-    
-    # Undef a couple of methods that are common ActiveRecord attributes.
-    # (Both of these are deprecated in Ruby 1.8 anyway.)
-    undef_method :id   if respond_to?(:id)
-    undef_method :type if respond_to?(:type)
     
   private
     

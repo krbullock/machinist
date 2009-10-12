@@ -17,4 +17,9 @@ ActiveRecord::Schema.define(:version => 0) do
     t.column :author_id, :integer
     t.column :body, :text
   end
+
+  create_table :urls, :force => true do |t|
+    t.column :url, :string
+    t.column :format, :string
+  end
 end

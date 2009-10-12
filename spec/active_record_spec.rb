@@ -19,6 +19,9 @@ module MachinistActiveRecordSpecs
     belongs_to :author, :class_name => "Person"
   end
 
+  class Url < ActiveRecord::Base
+  end
+
   describe Machinist, "ActiveRecord adapter" do
     before(:suite) do
       ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/log/test.log")
@@ -28,6 +31,17 @@ module MachinistActiveRecordSpecs
   
     before(:each) do
       [Person, Admin, Post, Comment].each(&:clear_blueprints!)
+    end
+  
+    it "should allow attributes named the same as Kernel/Object methods" do
+      Url.blueprint do
+        url     { "http://example.com/" }
+        format  { "html" }
+      end
+      lambda {
+        @url = Url.make
+      }.should_not raise_error
+      @url.format.should == "html"
     end
   
     describe "make method" do

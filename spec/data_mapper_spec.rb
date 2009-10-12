@@ -34,6 +34,13 @@ module MachinistDataMapperSpecs
     belongs_to :author, :class_name => "Person", :child_key => [:author_id]
   end
 
+  class Url
+    include DataMapper::Resource
+    property :id,     Serial
+    property :url,    String
+    property :format, String
+  end
+
   describe Machinist, "DataMapper adapter" do  
     before(:suite) do
       DataMapper::Logger.new(File.dirname(__FILE__) + "/log/test.log", :debug)
@@ -43,6 +50,17 @@ module MachinistDataMapperSpecs
 
     before(:each) do
       [Person, Admin, Post, Comment].each(&:clear_blueprints!)
+    end
+
+    it "should allow attributes named the same as Kernel/Object methods" do
+      Url.blueprint do
+        url     { "http://example.com/" }
+        format  { "html" }
+      end
+      lambda {
+        @url = Url.make
+      }.should_not raise_error
+      @url.format.should == "html"
     end
 
     describe "make method" do

@@ -23,6 +23,10 @@ module MachinistSpecs
     attr_accessor :name
   end
 
+  class Url
+    attr_accessor :url, :format
+  end
+
   describe Machinist do
     before(:each) do
       [Person, Post, Grandpa, Dad, Son].each(&:clear_blueprints!)
@@ -106,6 +110,17 @@ module MachinistSpecs
         body { title }
       end
       Post.make.body.should == "Test"
+    end
+
+    it "should allow attributes named the same as Kernel/Object methods" do
+      Url.blueprint do
+        url     { "http://example.com/" }
+        format  { "html" }
+      end
+      lambda {
+        @url = Url.make
+      }.should_not raise_error
+      @url.format.should == "html"
     end
   
     describe "named blueprints" do
